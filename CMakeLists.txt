@@ -3,4 +3,4 @@ project(reversi)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(reversi main.cpp)
+add_executable(reversi main.cpp Game.cpp Game.h)
