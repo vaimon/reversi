@@ -25,21 +25,25 @@ public:
 
     static bool evalDirection(int dir, int *i, int *j);
 
-    std::map<int, std::vector<std::pair<int, int>>> getAvailableMoves();
+    std::map<int, std::vector<std::pair<int, int>>> getAvailableMoves(Field f) const;
 
     static bool isFinish(Field f);
 
     static void printField(Field f);
 
-    void makeMove(int move, const std::vector<std::pair<int, int>> &);
+    void makeMove(Field& f, int move, const std::vector<std::pair<int, int>> &) const;
 
-    void makeOpponentMove(const std::string &botMove);
+    void makeOpponentMove(Field& f, const std::string &botMove) const;
 
     static std::string botifyMove(int move);
 
     static int debotifyMove(std::string move);
 
-    std::map<int, std::vector<std::pair<int, int>>> getOpponentMoves();
+    std::map<int, std::vector<std::pair<int, int>>> getOpponentMoves(Field f) const;
+
+    std::string decideHowToMove(){
+
+    }
 };
 
 

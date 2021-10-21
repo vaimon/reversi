@@ -62,17 +62,17 @@ bool Game::evalDirection(int dir, int *i, int *j) {
     }
 }
 
-std::map<int, std::vector<std::pair<int,int>>> Game::getAvailableMoves() {
+std::map<int, std::vector<std::pair<int,int>>> Game::getAvailableMoves(Field f) const {
     std::map<int, std::vector<std::pair<int,int>>> res{};
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            if(currentState[i][j] == ourColor){
+            if(f[i][j] == ourColor){
                 for(int dir = 1; dir <=8; dir++){
                     int k = i, l = j, c = 0;
-                    while(evalDirection(dir,&k,&l) && currentState[k][l] != ourColor && currentState[k][l] != 0){
+                    while(evalDirection(dir,&k,&l) && f[k][l] != ourColor && f[k][l] != 0){
                         c++;
                     }
-                    if(currentState[k][l] == 0 && c > 0){
+                    if(f[k][l] == 0 && c > 0){
                         res[k*8+l].push_back({i*8+j, dir});
                     }
                 }
@@ -82,17 +82,17 @@ std::map<int, std::vector<std::pair<int,int>>> Game::getAvailableMoves() {
     return res;
 }
 
-std::map<int, std::vector<std::pair<int,int>>> Game::getOpponentMoves() {
+std::map<int, std::vector<std::pair<int,int>>> Game::getOpponentMoves(Field f) const {
     std::map<int, std::vector<std::pair<int,int>>> res{};
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            if(currentState[i][j] == opponentColor){
+            if(f[i][j] == opponentColor){
                 for(int dir = 1; dir <=8; dir++){
                     int k = i, l = j, c = 0;
-                    while(evalDirection(dir,&k,&l) && currentState[k][l] != opponentColor && currentState[k][l] != 0){
+                    while(evalDirection(dir,&k,&l) && f[k][l] != opponentColor && f[k][l] != 0){
                         c++;
                     }
-                    if(currentState[k][l] == 0 && c > 0){
+                    if(f[k][l] == 0 && c > 0){
                         res[k*8+l].push_back({i*8+j, dir});
                     }
                 }
@@ -102,29 +102,29 @@ std::map<int, std::vector<std::pair<int,int>>> Game::getOpponentMoves() {
     return res;
 }
 
-void Game::makeMove(int move, const std::vector<std::pair<int,int>>& affectedCheckers){
+void Game::makeMove(Field& f, int move, const std::vector<std::pair<int,int>>& affectedCheckers) const{
     //currentState[move/8][move%8] = ourColor;
     for (std::pair<int,int> pos : affectedCheckers) {
         int i = pos.first/8, j = pos.first % 8;
         while(i!=move/8 && j!=move%8){
             evalDirection(pos.second,&i,&j);
-            currentState[i][j] = ourColor;
+            f[i][j] = ourColor;
         }
     }
 }
 
-void Game::makeOpponentMove(const std::string &botMove) {
+void Game::makeOpponentMove(Field& f, const std::string &botMove) const {
     int move = debotifyMove(botMove);
     for (int dir = 1; dir <= 8; dir++) {
         int k = move / 8, l = move % 8, c = 0;
-        while (evalDirection(dir, &k, &l) && currentState[k][l] == ourColor) {
+        while (evalDirection(dir, &k, &l) && f[k][l] == ourColor) {
             c++;
         }
-        if (currentState[k][l] == opponentColor && c > 0) {
+        if (f[k][l] == opponentColor && c > 0) {
             int i = move / 8, j = move % 8;
             while(i!=k && j!=l){
                 evalDirection(dir,&i,&j);
-                currentState[i][j] = opponentColor;
+                f[i][j] = opponentColor;
             }
         }
     }
