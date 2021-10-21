@@ -42,7 +42,7 @@ public:
 
     std::map<int, std::vector<std::pair<int, int>>> getOpponentMoves(Field f) const;
 
-    int h(Field f);
+    int h(Field f) const;
 
     std::pair<int,int> alphaBeta(Field f, int move, int depth, int alpha, int beta, bool isMax);
 

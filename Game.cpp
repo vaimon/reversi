@@ -213,11 +213,8 @@ std::string Game::botifyMove(int move) {
     return ss.str();
 }
 
-
-int thatSmartGuyHeuristics(Field)
-
 /// https://kartikkukreja.wordpress.com/2013/03/30/heuristic-function-for-reversiothello/
-int Game::h(Field f) {
+int Game::h(Field f) const {
     double hCoinParity = 0;
     double hPagodaDistribution = 0;
     double hMobility = 0;
