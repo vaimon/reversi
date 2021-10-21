@@ -102,13 +102,13 @@ std::map<int, std::vector<std::pair<int,int>>> Game::getOpponentMoves(Field f) c
     return res;
 }
 
-void Game::makeMove(Field& f, int move, const std::vector<std::pair<int,int>>& affectedCheckers) const{
+void Game::makeMove(Field& f, int move, const std::vector<std::pair<int,int>>& affectedCheckers, bool isOurMove) const{
     //currentState[move/8][move%8] = ourColor;
     for (std::pair<int,int> pos : affectedCheckers) {
         int i = pos.first/8, j = pos.first % 8;
         while(i!=move/8 && j!=move%8){
             evalDirection(pos.second,&i,&j);
-            f[i][j] = ourColor;
+            f[i][j] = isOurMove ? ourColor: opponentColor;
         }
     }
 }
@@ -160,6 +160,43 @@ std::string Game::botifyMove(int move) {
     }
     ss << (move/8 + 1);
     return ss.str();
+}
+
+int Game::h(Field f) {
+
+}
+
+int Game::alphaBeta(Field f, int depth, int alpha, int beta, bool isMax) {
+    if (depth == 0 || isFinish(f)) {
+        return h(f);
+    }
+    if (isMax) {
+        int value = INT32_MIN;
+        for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: getAvailableMoves(f)) {
+            makeMove(f,child.first,child.second, true);
+            value = std::max(value, alphaBeta(f,depth - 1, alpha, beta, false));
+            if(value >= beta){
+                break;
+            }
+            alpha = std::max(alpha,value);
+        }
+        return value;
+    } else{
+        int value = INT32_MAX;
+        for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: getOpponentMoves(f)) {
+            makeMove(f,child.first,child.second,false);
+            value = std::min(value, alphaBeta(f,depth - 1, alpha, beta, true));
+            if(value <= alpha){
+                break;
+            }
+            beta = std::min(beta,value);
+        }
+        return value;
+    }
+}
+
+std::string Game::decideHowToMove() {
+    alphaBeta(currentState,5,INT32_MIN,INT32_MAX,true);
 }
 
 

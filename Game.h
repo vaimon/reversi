@@ -31,9 +31,9 @@ public:
 
     static void printField(Field f);
 
-    void makeMove(Field& f, int move, const std::vector<std::pair<int, int>> &) const;
+    void makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &, bool isOurMove = true) const;
 
-    void makeOpponentMove(Field& f, const std::string &botMove) const;
+    void makeOpponentMove(Field &f, const std::string &botMove) const;
 
     static std::string botifyMove(int move);
 
@@ -41,9 +41,11 @@ public:
 
     std::map<int, std::vector<std::pair<int, int>>> getOpponentMoves(Field f) const;
 
-    std::string decideHowToMove(){
+    int h(Field f);
 
-    }
+    int alphaBeta(Field f, int depth, int alpha, int beta, bool isMax);
+
+    std::string decideHowToMove();
 };
 
 
