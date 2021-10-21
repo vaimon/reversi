@@ -10,8 +10,18 @@ void f(int z){
 }
 
 int main() {
-    for(int i = 0; i < 64; i++){
-        std::cout << i << " => " << Game::botifyMove(i) << " => " << Game::debotifyMove(Game::botifyMove(i)) << std::endl;
+    Game g(1);
+    while (true){
+        auto move = g.decideHowToMove();
+        g.makeBotMove(move,true);
+        std::cout << "Our move: " << move << std::endl;
+        g.printField();
+        std::string oppMove;
+        std::cin >> oppMove;
+        g.makeBotMove(oppMove,false);
+        std::cout << "Opponent move: " << move << std::endl;
+        g.printField();
+        std::cout<<std::endl<<std::endl;
     }
     return 0;
 }

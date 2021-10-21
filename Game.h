@@ -30,11 +30,11 @@ public:
 
     static bool isFinish(Field f);
 
-    static void printField(Field f);
+    void printField();
 
-    void makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &, bool isOurMove = true) const;
+    void makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &affectedCheckers, bool isOurMove = true) const;
 
-    void makeOpponentMove(Field &f, const std::string &botMove) const;
+    void makeBotMove(const std::string &botMove, bool isOurMove);
 
     static std::string botifyMove(int move);
 

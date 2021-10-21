@@ -42,12 +42,12 @@ bool Game::isFinish(Field f) {
     return true;
 }
 
-void Game::printField(Field f) {
+void Game::printField() {
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            if (f[i][j] == 0) {
+            if (currentState[i][j] == 0) {
                 std::cout << "  -";
-            } else if (f[i][j] == 1) {
+            } else if (currentState[i][j] == 1) {
                 std::cout << "  x";
             } else {
                 std::cout << "  o";
@@ -132,18 +132,20 @@ Game::makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &affec
     }
 }
 
-void Game::makeOpponentMove(Field &f, const std::string &botMove) const {
+void Game::makeBotMove(const std::string &botMove, bool isOurMove) {
     int move = debotifyMove(botMove);
+    int currentColor = isOurMove? ourColor: opponentColor;
     for (int dir = 1; dir <= 8; dir++) {
         int k = move / 8, l = move % 8, c = 0;
-        while (evalDirection(dir, &k, &l) && f[k][l] == ourColor) {
+        while (evalDirection(dir, &k, &l) && currentState[k][l] != currentColor && currentState[k][l] != 0) {
             c++;
         }
-        if (f[k][l] == opponentColor && c > 0) {
+        if (currentState[k][l] == currentColor && c > 0) {
             int i = move / 8, j = move % 8;
-            while (i != k && j != l) {
+            currentState[i][j] = currentColor;
+            while (i != k || j != l) {
                 evalDirection(dir, &i, &j);
-                f[i][j] = opponentColor;
+                currentState[i][j] = currentColor;
             }
         }
     }
