@@ -18,6 +18,7 @@ class Game {
     // 0 - empty 1 = black, 2 = white
     unsigned short ourColor = 2;
     unsigned short opponentColor = 1;
+    static std::vector<std::vector<int>> pagodaCoeffs;
 public:
     Game(unsigned short ourColor);
 
@@ -43,7 +44,7 @@ public:
 
     int h(Field f);
 
-    int alphaBeta(Field f, int depth, int alpha, int beta, bool isMax);
+    std::pair<int,int> alphaBeta(Field f, int move, int depth, int alpha, int beta, bool isMax);
 
     std::string decideHowToMove();
 };
