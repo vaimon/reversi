@@ -19,6 +19,7 @@ class Game {
     unsigned short ourColor = 2;
     unsigned short opponentColor = 1;
     static std::vector<std::vector<int>> pagodaCoeffs;
+    const int ALPHA_BETA_DEPTH = 5;
 public:
     Game(unsigned short ourColor);
 
@@ -28,7 +29,7 @@ public:
 
     std::map<int, std::vector<std::pair<int, int>>> getAvailableMoves(Field f) const;
 
-    static bool isFinish(Field f);
+    bool isFinish(Field f);
 
     void printField();
 
@@ -44,7 +45,7 @@ public:
 
     int h(Field f) const;
 
-    std::pair<int,int> alphaBeta(Field f, int move, int depth, int alpha, int beta, bool isMax);
+    int alphaBeta(Field f, int depth, int alpha, int beta, bool isMax, bool returnMove = false);
 
     std::string decideHowToMove();
 };

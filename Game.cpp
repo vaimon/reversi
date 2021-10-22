@@ -32,6 +32,10 @@ Field Game::getInitialState() {
 }
 
 bool Game::isFinish(Field f) {
+    //std::cout<< "isFinish " <<std::endl;
+    if(getAvailableMoves(f).empty() && getOpponentMoves(f).empty()){
+        return true;
+    }
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             if (f[i][j] == 0) {
@@ -43,14 +47,19 @@ bool Game::isFinish(Field f) {
 }
 
 void Game::printField() {
+    auto moves = getOpponentMoves(currentState);
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             if (currentState[i][j] == 0) {
-                std::cout << "  -";
+                if(moves.find(i*8+j) != moves.end()){
+                    std::cout << "  " << botifyMove(i*8+j);
+                    continue;
+                }
+                std::cout << "   -";
             } else if (currentState[i][j] == 1) {
-                std::cout << "  x";
+                std::cout << "   x";
             } else {
-                std::cout << "  o";
+                std::cout << "   o";
             }
         }
         std::cout << std::endl;
@@ -81,6 +90,7 @@ bool Game::evalDirection(int dir, int *i, int *j) {
 }
 
 std::map<int, std::vector<std::pair<int, int>>> Game::getAvailableMoves(Field f) const {
+    //std::cout<< "getAvailableMoves " <<std::endl;
     std::map<int, std::vector<std::pair<int, int>>> res{};
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
@@ -101,6 +111,7 @@ std::map<int, std::vector<std::pair<int, int>>> Game::getAvailableMoves(Field f)
 }
 
 std::map<int, std::vector<std::pair<int, int>>> Game::getOpponentMoves(Field f) const {
+    //std::cout<< "getOpponentMoves " <<std::endl;
     std::map<int, std::vector<std::pair<int, int>>> res{};
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
@@ -123,6 +134,7 @@ std::map<int, std::vector<std::pair<int, int>>> Game::getOpponentMoves(Field f) 
 void
 Game::makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &affectedCheckers, bool isOurMove) const {
     //currentState[move/8][move%8] = ourColor;
+    //std::cout<< "makeMove " <<std::endl;
     for (std::pair<int, int> pos: affectedCheckers) {
         int i = pos.first / 8, j = pos.first % 8;
         while (i != move / 8 && j != move % 8) {
@@ -133,6 +145,7 @@ Game::makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &affec
 }
 
 void Game::makeBotMove(const std::string &botMove, bool isOurMove) {
+    //std::cout<< "makeBotMove " <<std::endl;
     int move = debotifyMove(botMove);
     int currentColor = isOurMove? ourColor: opponentColor;
     for (int dir = 1; dir <= 8; dir++) {
@@ -217,6 +230,7 @@ std::string Game::botifyMove(int move) {
 
 /// https://kartikkukreja.wordpress.com/2013/03/30/heuristic-function-for-reversiothello/
 int Game::h(Field f) const {
+    //std::cout<< "heuristics " <<std::endl;
     double hCoinParity = 0;
     double hPagodaDistribution = 0;
     double hMobility = 0;
@@ -254,47 +268,47 @@ int Game::h(Field f) const {
         hMobility = (100.0 * me)/(me + opponent);
     else if(me < opponent)
         hMobility = -(100.0 * opponent)/(me + opponent);
-    return (int) (29.954 * hCoinParity + 801.724 * hCornerOccupancy + 78.968 * hMobility + 89.354 * hPagodaDistribution);
+    return (int) (29.954 * hCoinParity + 701.724 * hCornerOccupancy + 108.968 * hMobility + 159.354 * hPagodaDistribution);
 }
 
-std::pair<int, int> Game::alphaBeta(Field f, int move, int depth, int alpha, int beta, bool isMax) {
+int Game::alphaBeta(Field f, int depth, int alpha, int beta, bool isMax, bool returnMove) {
+    //std::cout<< "alphaBeta " <<std::endl;
     if (depth == 0 || isFinish(f)) {
-        return {h(f), move};
+        return h(f);
     }
     if (isMax) {
-        std::pair<int, int> value = {INT32_MIN, move};
-        for (const std::pair<const int, std::vector<std::pair<int, int>>> &child: getAvailableMoves(f)) {
-            makeMove(f, child.first, child.second, true);
-            value = std::max(value, alphaBeta(f, child.first, depth - 1, alpha, beta, false),
-                             [](std::pair<int, int> p1, std::pair<int, int> p2) {
-                                 return p1.first < p2.first;
-                             });
-            if (value.first >= beta) {
+        int value = INT32_MIN;
+        int savedMove = -1;
+        for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: getAvailableMoves(f)) {
+            makeMove(f,child.first,child.second, true);
+            int childRes = alphaBeta(f,depth - 1, alpha, beta, false);
+            if (value < childRes){
+                value = childRes;
+                savedMove = child.first;
+            }
+            if(value >= beta){
                 break;
             }
-            alpha = std::max(alpha, value.first);
+            alpha = std::max(alpha,value);
         }
-        return value;
-    } else {
-        std::pair<int, int> value = {INT32_MAX, move};
-        for (const std::pair<const int, std::vector<std::pair<int, int>>> &child: getOpponentMoves(f)) {
-            makeMove(f, child.first, child.second, false);
-            value = std::min(value, alphaBeta(f, child.first, depth - 1, alpha, beta, true),
-                             [](std::pair<int, int> p1, std::pair<int, int> p2) {
-                                 return p1.first < p2.first;
-                             });
-            if (value.first <= alpha) {
+        return returnMove? savedMove: value;
+    } else{
+        int value = INT32_MAX;
+        for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: getOpponentMoves(f)) {
+            makeMove(f,child.first,child.second,false);
+            value = std::min(value, alphaBeta(f,depth - 1, alpha, beta, true));
+            if(value <= alpha){
                 break;
             }
-            beta = std::min(beta, value.first);
+            beta = std::min(beta,value);
         }
         return value;
     }
 }
 
 std::string Game::decideHowToMove() {
-    auto rankedMove = alphaBeta(currentState, -1, 5, INT32_MIN, INT32_MAX, true);
-    return botifyMove(rankedMove.second);
+    auto rankedMove = alphaBeta(currentState, ALPHA_BETA_DEPTH, INT32_MIN, INT32_MAX, true, true);
+    return botifyMove(rankedMove);
 }
 
 
