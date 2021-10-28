@@ -50,6 +50,8 @@ public:
     std::string decideHowToMove();
 
     std::string checkForWin();
+
+    bool isOpponentSkipping();
 };
 
 

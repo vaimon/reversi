@@ -343,6 +343,10 @@ std::string Game::checkForWin() {
     return "";
 }
 
+bool Game::isOpponentSkipping() {
+    return getOpponentMoves(currentState).empty();
+}
+
 
 
 
