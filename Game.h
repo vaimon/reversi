@@ -23,9 +23,9 @@ class Game {
 public:
     Game(unsigned short ourColor);
 
-    static Field getInitialState();
+    Field getInitialState();
 
-    static bool evalDirection(int dir, int *i, int *j);
+    static bool evalDirection(int dir, int &i, int &j);
 
     std::map<int, std::vector<std::pair<int, int>>> getAvailableMoves(Field f) const;
 

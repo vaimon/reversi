@@ -48,7 +48,13 @@ bool Game::isFinish(Field f) {
 
 void Game::printField() {
     auto moves = getOpponentMoves(currentState);
+    std::cout << "  ";
     for (int i = 0; i < 8; ++i) {
+        std::cout << "  " << (char)('A' + i) << " ";
+    }
+    std::cout<<std::endl;
+    for (int i = 0; i < 8; ++i) {
+        std::cout << i + 1;
         for (int j = 0; j < 8; ++j) {
             if (currentState[i][j] == 0) {
                 if(moves.find(i*8+j) != moves.end()){
@@ -66,24 +72,24 @@ void Game::printField() {
     }
 }
 
-bool Game::evalDirection(int dir, int *i, int *j) {
+bool Game::evalDirection(int dir, int &i, int &j) {
     switch (dir) {
         case 1:
-            return --*j >= 0;
+            return --j >= 0;
         case 2:
-            return --*j >= 0 && --*i >= 0;
+            return (--j >= 0) && (--i >= 0);
         case 3:
-            return --*i >= 0;
+            return --i >= 0;
         case 4:
-            return --*i >= 0 && ++*j < 8;
+            return (--i >= 0) && (++j < 8);
         case 5:
-            return ++*j < 8;
+            return ++j < 8;
         case 6:
-            return ++*i < 8 && ++*j < 8;
+            return (++i < 8) && (++j < 8);
         case 7:
-            return ++*i < 8;
+            return ++i < 8;
         case 8:
-            return ++*i < 8 && --*j >= 0;
+            return (++i < 8) && (--j >= 0);
         default:
             return false;
     }
@@ -97,10 +103,10 @@ std::map<int, std::vector<std::pair<int, int>>> Game::getAvailableMoves(Field f)
             if (f[i][j] == ourColor) {
                 for (int dir = 1; dir <= 8; dir++) {
                     int k = i, l = j, c = 0;
-                    while (evalDirection(dir, &k, &l) && f[k][l] != ourColor && f[k][l] != 0) {
+                    while (evalDirection(dir, k, l) && (f[k][l] != ourColor) && (f[k][l] != 0)) {
                         c++;
                     }
-                    if (f[k][l] == 0 && c > 0) {
+                    if ((k < 8) && (l < 8) && (k>=0) && (l>=0) && (f[k][l] == 0) && (c > 0)) {
                         res[k * 8 + l].push_back({i * 8 + j, dir});
                     }
                 }
@@ -118,10 +124,10 @@ std::map<int, std::vector<std::pair<int, int>>> Game::getOpponentMoves(Field f) 
             if (f[i][j] == opponentColor) {
                 for (int dir = 1; dir <= 8; dir++) {
                     int k = i, l = j, c = 0;
-                    while (evalDirection(dir, &k, &l) && f[k][l] != opponentColor && f[k][l] != 0) {
+                    while (evalDirection(dir, k, l) && (f[k][l] != opponentColor) && (f[k][l] != 0)) {
                         c++;
                     }
-                    if (f[k][l] == 0 && c > 0) {
+                    if ((k < 8) && (l < 8) && (k>=0) && (l>=0) && (f[k][l] == 0) && (c > 0)) {
                         res[k * 8 + l].push_back({i * 8 + j, dir});
                     }
                 }
@@ -131,14 +137,13 @@ std::map<int, std::vector<std::pair<int, int>>> Game::getOpponentMoves(Field f) 
     return res;
 }
 
-void
-Game::makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &affectedCheckers, bool isOurMove) const {
+void Game::makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &affectedCheckers, bool isOurMove) const {
     //currentState[move/8][move%8] = ourColor;
     //std::cout<< "makeMove " <<std::endl;
     for (std::pair<int, int> pos: affectedCheckers) {
         int i = pos.first / 8, j = pos.first % 8;
-        while (i != move / 8 && j != move % 8) {
-            evalDirection(pos.second, &i, &j);
+        while ((i != move / 8) && (j != move % 8)) {
+            evalDirection(pos.second, i, j);
             f[i][j] = isOurMove ? ourColor : opponentColor;
         }
     }
@@ -150,14 +155,14 @@ void Game::makeBotMove(const std::string &botMove, bool isOurMove) {
     int currentColor = isOurMove? ourColor: opponentColor;
     for (int dir = 1; dir <= 8; dir++) {
         int k = move / 8, l = move % 8, c = 0;
-        while (evalDirection(dir, &k, &l) && currentState[k][l] != currentColor && currentState[k][l] != 0) {
+        while (evalDirection(dir, k, l) && (currentState[k][l] != currentColor) && (currentState[k][l] != 0)) {
             c++;
         }
-        if (currentState[k][l] == currentColor && c > 0) {
+        if ((k < 8) && (l < 8) && (k>=0) && (l>=0) &&(currentState[k][l] == currentColor) && (c > 0)) {
             int i = move / 8, j = move % 8;
             currentState[i][j] = currentColor;
-            while (i != k || j != l) {
-                evalDirection(dir, &i, &j);
+            while ((i != k) || (j != l)) {
+                evalDirection(dir, i, j);
                 currentState[i][j] = currentColor;
             }
         }
@@ -281,7 +286,7 @@ int Game::alphaBeta(Field f, int depth, int alpha, int beta, bool isMax, bool re
         int savedMove = -1;
         for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: getAvailableMoves(f)) {
             makeMove(f,child.first,child.second, true);
-            int childRes = alphaBeta(f,depth - 1, alpha, beta, false);
+            int childRes = alphaBeta(f,depth - 1, alpha, beta, false, false);
             if (value < childRes){
                 value = childRes;
                 savedMove = child.first;
@@ -296,7 +301,7 @@ int Game::alphaBeta(Field f, int depth, int alpha, int beta, bool isMax, bool re
         int value = INT32_MAX;
         for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: getOpponentMoves(f)) {
             makeMove(f,child.first,child.second,false);
-            value = std::min(value, alphaBeta(f,depth - 1, alpha, beta, true));
+            value = std::min(value, alphaBeta(f,depth - 1, alpha, beta, true, false));
             if(value <= alpha){
                 break;
             }
@@ -307,6 +312,12 @@ int Game::alphaBeta(Field f, int depth, int alpha, int beta, bool isMax, bool re
 }
 
 std::string Game::decideHowToMove() {
+    if(isFinish(currentState)){
+        return "finish";
+    }
+    if(getAvailableMoves(currentState).size() == 0){
+        return "skip";
+    }
     auto rankedMove = alphaBeta(currentState, ALPHA_BETA_DEPTH, INT32_MIN, INT32_MAX, true, true);
     return botifyMove(rankedMove);
 }

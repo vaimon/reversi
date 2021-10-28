@@ -13,13 +13,21 @@ int main() {
     Game g(1);
     while (true){
         auto move = g.decideHowToMove();
-        g.makeBotMove(move,true);
-        std::cout << "Our move: " << move << std::endl;
-        g.printField();
+        if (move == "skip"){
+            std::cout << "Skip move " << std::endl;
+        } else if (move == "finish"){
+            std::cout << "Finish! " << std::endl;
+            return 0;
+        }else {
+            g.makeBotMove(move,true);
+            std::cout << "Our move: " << move << std::endl;
+            g.printField();
+        }
+
         std::string oppMove;
         std::cin >> oppMove;
         g.makeBotMove(oppMove,false);
-        std::cout << "Opponent move: " << move << std::endl;
+        std::cout << "Opponent move: " << oppMove << std::endl;
         g.printField();
         std::cout<<std::endl<<std::endl;
     }
