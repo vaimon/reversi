@@ -48,6 +48,8 @@ public:
     int alphaBeta(Field f, int depth, int alpha, int beta, bool isMax, bool returnMove = false);
 
     std::string decideHowToMove();
+
+    std::string checkForWin();
 };
 
 

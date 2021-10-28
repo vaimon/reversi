@@ -312,14 +312,35 @@ int Game::alphaBeta(Field f, int depth, int alpha, int beta, bool isMax, bool re
 }
 
 std::string Game::decideHowToMove() {
-    if(isFinish(currentState)){
-        return "finish";
+    std::string state = checkForWin();
+    if (state!=""){
+        return state;
     }
     if(getAvailableMoves(currentState).size() == 0){
         return "skip";
     }
     auto rankedMove = alphaBeta(currentState, ALPHA_BETA_DEPTH, INT32_MIN, INT32_MAX, true, true);
     return botifyMove(rankedMove);
+}
+
+std::string Game::checkForWin() {
+    if(isFinish(currentState)){
+        int cntOurs =0, cntOpponent =0;
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                if (currentState[i][j] == ourColor) {
+                    cntOurs++;
+                }else if (currentState[i][j] == opponentColor){
+                    cntOpponent++;
+                }
+            }
+        }
+        if(cntOurs == cntOpponent){
+            return "draw";
+        }
+        return cntOurs > cntOpponent? "win" : "lose";
+    }
+    return "";
 }
 
 
