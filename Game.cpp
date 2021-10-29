@@ -205,6 +205,11 @@ int Game::debotifyMove(std::string move) {
         case 'h':
             res = 7;
             break;
+        default: {
+            std::cout << "Have you just tried to fool me?? NO WAY." << std::endl;
+            system("pause");
+            throw std::exception();
+        }
     }
     res += (std::stoi(move.substr(1, 1)) - 1) * 8;
     return res;

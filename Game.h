@@ -56,6 +56,11 @@ public:
     void printSituation(){
         std::cout << getOpponentMoves(currentState).size() << " " << getAvailableMoves(currentState).size() << std::endl;
     }
+
+    bool checkMove(std::string move){
+        int parsedMove = debotifyMove(move);
+        return getOpponentMoves(currentState).count(parsedMove) > 0;
+    }
 };
 
 

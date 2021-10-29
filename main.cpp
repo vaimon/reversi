@@ -2,6 +2,7 @@
 #include "Game.h"
 
 int main(int argc, char *argv[]) {
+    setlocale(LC_ALL,"Russian");
     bool isBotFightMode = false;
     int order = 1;
     if (argc > 1) {
@@ -28,13 +29,22 @@ int main(int argc, char *argv[]) {
         if (move == "skip") {
             std::cout << "Skip move " << std::endl;
         } else if (move == "draw") {
-            std::cout << "Draw! " << std::endl;
+            std::cout << "Well, draw is draw... " << std::endl;
+            if(!isBotFightMode){
+                system("pause");
+            }
             return 4;
         } else if (move == "win") {
-            std::cout << "Win! " << std::endl;
+            std::cout << "HAHAHAHAHAH SKINSUIT, I WON!! " << std::endl;
+            if(!isBotFightMode){
+                system("pause");
+            }
             return 0;
         } else if (move == "lose") {
-            std::cout << "Lose! " << std::endl;
+            std::cout << "I've missed the battle, but not the war... " << std::endl;
+            if(!isBotFightMode){
+                system("pause");
+            }
             return 3;
         } else {
             g.makeBotMove(move, true);
@@ -52,13 +62,22 @@ int main(int argc, char *argv[]) {
             }
             if (state != "") {
                 if (state == "draw") {
-                    std::cout << "Draw! " << std::endl;
+                    std::cout << "Well, draw is draw... " << std::endl;
+                    if(!isBotFightMode){
+                        system("pause");
+                    }
                     return 4;
                 } else if (state == "win") {
-                    std::cout << "Win! " << std::endl;
+                    std::cout << "HAHAHAHAHAH SKINSUIT, I WON!! " << std::endl;
+                    if(!isBotFightMode){
+                        system("pause");
+                    }
                     return 0;
                 } else if (state == "lose") {
-                    std::cout << "Lose! " << std::endl;
+                    std::cout << "I've missed the battle, but not the war... " << std::endl;
+                    if(!isBotFightMode){
+                        system("pause");
+                    }
                     return 3;
                 }
             }
@@ -78,6 +97,15 @@ int main(int argc, char *argv[]) {
             g.printSituation();
         }
         std::cin >> oppMove;
+        if(!g.checkMove(oppMove)){
+            std::cout << "You've tried to fool me, aren't you? You can't move that way." << std::endl;
+            std::cin >> oppMove;
+        }
+        if(!g.checkMove(oppMove)){
+            std::cout << "Well, I am offended right now. Bye." << std::endl;
+            system("pause");
+            throw std::exception("CHEATER!...");
+        }
         g.makeBotMove(oppMove, false);
         if(isBotFightMode){
             std::cout << order;
