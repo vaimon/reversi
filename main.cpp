@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
         order = (int) (*argv[1] - '0') + 1;
     }
     std::cout << isBotFightMode << " " << order << std::endl;
-    Game g(1);
+    Game g(order);
     g.printField();
     if (order == 2) {
         std::string oppMove;
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         std::cout << std::endl << std::endl;
     }
     while (true) {
-        //g.printSituation();
+        g.printSituation();
         auto move = g.decideHowToMove();
         if (move == "skip") {
             std::cout << "Skip move " << std::endl;
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         std::cout << "I am " << order << " waiting for my dumb opponent..." << std::endl;
-        //g.printSituation();
+        g.printSituation();
         std::cin >> oppMove;
         g.makeBotMove(oppMove, false);
         std::cout << order << " Opponent move: " << oppMove << std::endl;
