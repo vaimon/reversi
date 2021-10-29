@@ -26,24 +26,13 @@ Field Game::getInitialState() {
     Field res{};
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            res[i][j] = 2;
+            res[i][j] = 0;
         }
     }
-    res[1][2] =1;
-    res[2][2] = 1;
-    res[3][2] = 1;
-    res[3][5] = 1;
-    res[4][4] = 1;
-    res[4][5] = 1;
-    res[5][3] = 1;
-    res[5][4] = 1;
-    res[5][6] = 1;
-    res[7][1] = 1;
-    res[7][2] = 1;
-    res[7][3] = 1;
-    res[7][0] = 0;
-    res[7][5] = 0;
-    res[7][6] = 0;
+    res[3][3] = 2;
+    res[3][4] = 1;
+    res[4][3] = 1;
+    res[4][4] = 2;
 
     return res;
 }
