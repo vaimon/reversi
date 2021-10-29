@@ -24,10 +24,27 @@ Game::Game(unsigned short ourColor) : ourColor(ourColor) {
 
 Field Game::getInitialState() {
     Field res{};
-    res[3][3] = 2;
-    res[3][4] = 1;
-    res[4][3] = 1;
-    res[4][4] = 2;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            res[i][j] = 2;
+        }
+    }
+    res[1][2] =1;
+    res[2][2] = 1;
+    res[3][2] = 1;
+    res[3][5] = 1;
+    res[4][4] = 1;
+    res[4][5] = 1;
+    res[5][3] = 1;
+    res[5][4] = 1;
+    res[5][6] = 1;
+    res[7][1] = 1;
+    res[7][2] = 1;
+    res[7][3] = 1;
+    res[7][0] = 0;
+    res[7][5] = 0;
+    res[7][6] = 0;
+
     return res;
 }
 
@@ -137,16 +154,19 @@ std::map<int, std::vector<std::pair<int, int>>> Game::getOpponentMoves(Field f) 
     return res;
 }
 
-void Game::makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &affectedCheckers, bool isOurMove) const {
+Field Game::makeMove(const Field &f, int move, const std::vector<std::pair<int, int>> &affectedCheckers, bool isOurMove) const {
     //currentState[move/8][move%8] = ourColor;
     //std::cout<< "makeMove " <<std::endl;
+    Field newField;
+    std::copy(f.begin(),  f.end(),newField.begin());
     for (std::pair<int, int> pos: affectedCheckers) {
         int i = pos.first / 8, j = pos.first % 8;
-        while ((i != move / 8) && (j != move % 8)) {
+        while ((i != move / 8) || (j != move % 8)) {
             evalDirection(pos.second, i, j);
-            f[i][j] = isOurMove ? ourColor : opponentColor;
+            newField[i][j] = isOurMove ? ourColor : opponentColor;
         }
     }
+    return newField;
 }
 
 void Game::makeBotMove(const std::string &botMove, bool isOurMove) {
@@ -284,9 +304,14 @@ int Game::alphaBeta(Field f, int depth, int alpha, int beta, bool isMax, bool re
     if (isMax) {
         int value = INT32_MIN;
         int savedMove = -1;
-        for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: getAvailableMoves(f)) {
-            makeMove(f,child.first,child.second, true);
-            int childRes = alphaBeta(f,depth - 1, alpha, beta, false, false);
+        auto availableMoves = getAvailableMoves(f);
+        if(availableMoves.empty()){
+            return alphaBeta(f,depth - 1, alpha, beta, false, false);
+        }
+        for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: availableMoves) {
+            auto childF = makeMove(f,child.first,child.second, true);
+
+            int childRes = alphaBeta(childF,depth - 1, alpha, beta, false, false);
             if (value < childRes){
                 value = childRes;
                 savedMove = child.first;
@@ -299,9 +324,13 @@ int Game::alphaBeta(Field f, int depth, int alpha, int beta, bool isMax, bool re
         return returnMove? savedMove: value;
     } else{
         int value = INT32_MAX;
-        for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: getOpponentMoves(f)) {
-            makeMove(f,child.first,child.second,false);
-            value = std::min(value, alphaBeta(f,depth - 1, alpha, beta, true, false));
+        auto availableMoves = getOpponentMoves(f);
+        if(availableMoves.empty()){
+            return alphaBeta(f,depth - 1, alpha, beta, true, false);
+        }
+        for (const std::pair<const int, std::vector<std::pair<int, int>>>& child: availableMoves) {
+            Field childF = makeMove(f,child.first,child.second,false);
+            value = std::min(value, alphaBeta(childF,depth - 1, alpha, beta, true, false));
             if(value <= alpha){
                 break;
             }

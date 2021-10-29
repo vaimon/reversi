@@ -1,14 +1,6 @@
 #include <iostream>
 #include "Game.h"
 
-void g(int &z) {
-    z = 666;
-}
-
-void f(int z) {
-    g(z);
-}
-
 int main(int argc, char *argv[]) {
     bool isBotFightMode = false;
     int order = 1;
@@ -17,8 +9,7 @@ int main(int argc, char *argv[]) {
         order = (int) (*argv[1] - '0') + 1;
     }
     std::cout << isBotFightMode << " " << order << std::endl;
-    Game g(order);
-
+    Game g(1);
     g.printField();
     if (order == 2) {
         std::string oppMove;
@@ -29,6 +20,7 @@ int main(int argc, char *argv[]) {
         std::cout << std::endl << std::endl;
     }
     while (true) {
+        //g.printSituation();
         auto move = g.decideHowToMove();
         if (move == "skip") {
             std::cout << "Skip move " << std::endl;
@@ -66,11 +58,13 @@ int main(int argc, char *argv[]) {
         }
 
         std::string oppMove;
-        //std::cout << "I am " << order << " waiting for my dumb opponent..." << std::endl;
+
         if(g.isOpponentSkipping()){
             std::cout << "No moves, sweetie? Hahaha, my turn!" << std::endl;
             continue;
         }
+        std::cout << "I am " << order << " waiting for my dumb opponent..." << std::endl;
+        //g.printSituation();
         std::cin >> oppMove;
         g.makeBotMove(oppMove, false);
         std::cout << order << " Opponent move: " << oppMove << std::endl;

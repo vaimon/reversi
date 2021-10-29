@@ -33,7 +33,7 @@ public:
 
     void printField();
 
-    void makeMove(Field &f, int move, const std::vector<std::pair<int, int>> &affectedCheckers, bool isOurMove = true) const;
+    Field makeMove(const Field &f, int move, const std::vector<std::pair<int, int>> &affectedCheckers, bool isOurMove = true) const;
 
     void makeBotMove(const std::string &botMove, bool isOurMove);
 
@@ -52,6 +52,10 @@ public:
     std::string checkForWin();
 
     bool isOpponentSkipping();
+
+    void printSituation(){
+        std::cout << getOpponentMoves(currentState).size() << " " << getAvailableMoves(currentState).size() << std::endl;
+    }
 };
 
 
